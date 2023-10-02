@@ -1,0 +1,69 @@
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+}
+
+.nav-bar {
+  background-color: darkblue;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-button {
+  color: white;
+  border: none;
+  background-color: black;
+  padding: 25px;
+  font-size: 1.8rem;
+}
+.nav-button:hover {
+  color: gray;
+}
+
+.nav-list {
+  display: none;
+}
+.nav-list.active {
+  display: block;
+  position: absolute;
+  z-index: 1;
+  min-width: 150px;
+  background-color: red;
+}
+
+.nav-list a {
+  display: block;
+  padding: 12px 16px;
+  text-decoration: none;
+  color: black;
+}
+
+.authorize {
+  display: flex;
+  justify-content: center;
+}
+
+.authorize-button {
+  padding: 15px;
+  background-color: rgb(0, 71, 0);
+  color: white;
+}
+.authorize-button:hover {
+  box-shadow: inset -2px -2px 3px rgba(4, 187, 4, 0.6),
+    inset 2px 2px 3px rgba(0, 100, 0, 0.6);
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      media="all"
+      href="ispinner-master/ispinner.prefixed.css"
+    />
+    <link rel="stylesheet" href="main-styles.css" />
+  </head>
+  <body>
+    <h1>Nigma</h1>
+    <form id="APIForm">
+      <label for="itemNumber"
+        >Enter number of songs you would like to request:</label
+      >
+      <input
+        type="number"
+        id="itemNumber"
+        min="1"
+        placeholder="Enter a number"
+      />
+      <button class="playlists-button" type="submit">Get Liked Songs</button>
+    </form>
+    <button class="log-out-button" type="button" onclick="clientLogOut()">
+      Log Out
+    </button>
+    <button class="clear-button" type="button" onclick="clearTable()">
+      Clear
+    </button>
+    <div class="ispinner ispinner-large" style="display: none">
+      <div class="ispinner-blade"></div>
+      <div class="ispinner-blade"></div>
+      <div class="ispinner-blade"></div>
+      <div class="ispinner-blade"></div>
+      <div class="ispinner-blade"></div>
+      <div class="ispinner-blade"></div>
+      <div class="ispinner-blade"></div>
+      <div class="ispinner-blade"></div>
+    </div>
+    <div class="song-display" id="paginated-list" aria-live="polite">
+      <table id="table-element">
+        <thead>
+          <th>Album Cover</th>
+          <th>Artist</th>
+          <th>Song Name</th>
+          <th>Album</th>
+          <th>Date Added</th>
+          <th>Duration</th>
+          <th></th>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>
