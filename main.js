@@ -5,6 +5,15 @@ function checkUserAuthorization() {
   }
 }
 
+function toggleDisplay(selector) {
+  const element = document.querySelector(selector);
+  if (element.style.display == "none") {
+    element.style.display = "block";
+  } else {
+    element.style.display = "none";
+  }
+}
+
 function clientLogOut() {
   localStorage.clear();
   window.location.href = "./index.html";
@@ -14,19 +23,21 @@ document.getElementById("APIForm").addEventListener("submit", function (event) {
   event.preventDefault();
 
   const itemNumber = document.getElementById("itemNumber").value;
+
   if (itemNumber <= 0) {
     alert("Please enter a valid number greater than 0.");
     return;
   } else if (itemNumber <= 50) {
+    clearTable();
     getPlaylists(itemNumber);
   } else {
+    clearTable();
     getMultiplePlaylists(itemNumber);
   }
 });
 
 async function getPlaylists(itemNumber, offset = 0) {
-  const spinner = document.querySelector(".ispinner");
-  spinner.style.display = "block";
+  toggleDisplay(".ispinner");
 
   const accessToken = localStorage.getItem("access_token");
 
@@ -59,8 +70,7 @@ async function getPlaylists(itemNumber, offset = 0) {
 }
 
 async function getMultiplePlaylists(itemNumber) {
-  const spinner = document.querySelector(".ispinner");
-  spinner.style.display = "block";
+  toggleDisplay(".ispinner");
 
   const accessToken = localStorage.getItem("access_token");
 
@@ -97,6 +107,7 @@ async function getMultiplePlaylists(itemNumber) {
       })
       .then((data) => {
         // localStorage.setItem(`trackData`, JSON.stringify(data));
+        console.log(JSON.stringify(data));
         handleLikedSongsResponse(data, i);
       })
       .catch((error) => {
@@ -106,6 +117,7 @@ async function getMultiplePlaylists(itemNumber) {
     offset += 50;
     itemNumber -= 50;
   }
+  toggleDisplay(".ispinner");
 }
 
 /**
@@ -195,14 +207,20 @@ function handleLikedSongsResponse(data, timesCalled = 0) {
     tableBody.appendChild(tableRow);
     table.appendChild(tableBody);
     tableDiv.appendChild(table);
-    const spinner = document.querySelector(".ispinner");
-    spinner.style.display = "none";
+    toggleDisplay(".ispinner");
   });
 }
 
 function clearTable() {
-  const tableBody = document.getElementById("table-body");
-  tableBody.remove("tr");
+  const oldTableBody = document.getElementById("table-body");
+  oldTableBody.remove("tr");
+
+  const table = document.getElementById("table-element");
+  const newTableBody = document.createElement("tbody");
+  newTableBody.setAttribute("id", "table-body");
+
+  table.appendChild(newTableBody);
+  toggleDisplay(".table-element");
 }
 
 //Pagination implementation
