@@ -3,37 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="styles.css" rel="stylesheet" />
+    <link href="/src/main-styles.css" rel="stylesheet" />
+    <link href="./dist/output.css" rel="stylesheet" />
     <!-- <script src="script.js"></script>
     <script src="test.js"></script> -->
     <title>Document</title>
   </head>
   <body>
-    <div class="nav-bar">
-      <h1>Musify</h1>
-      <div class="nav-menu">
-        <button id="nav-button" class="nav-button" onclick="navButtonClick()">
-          Menu
-        </button>
-        <div class="nav-list" id="nav-list">
-          <a href="">Home</a>
-          <a href="">About</a>
-          <a href="">Login</a>
-        </div>
-      </div>
-    </div>
-    <div class="page-wrapper">
-      <div class="main-page">
-        <button class="page-button" id="main-button">Click this!</button>
-        <p id="main-text">This text will change.</p>
+    <div
+      class="page-wrapper max-w-lg flex align-middle justify-center flex-col p-24 h-screen"
+    >
+      <div class="">
+        <h1 class="text-lgr text-6xl">Musify</h1>
       </div>
       <div class="authorize">
         <button
-          class="authorize-button"
+          class="authorize-button p-10"
           type="button"
           onclick="handleAuthorizeClick()"
         >
-          Authorize Spotify
+          Connect to Spotify
         </button>
       </div>
     </div>

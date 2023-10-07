@@ -34,11 +34,10 @@ document.getElementById("APIForm").addEventListener("submit", function (event) {
     clearTable();
     getMultiplePlaylists(itemNumber);
   }
+  toggleDisplay(".table-element");
 });
 
 async function getPlaylists(itemNumber, offset = 0) {
-  toggleDisplay(".ispinner");
-
   const accessToken = localStorage.getItem("access_token");
 
   // if (itemNumber > 50) {
@@ -70,8 +69,6 @@ async function getPlaylists(itemNumber, offset = 0) {
 }
 
 async function getMultiplePlaylists(itemNumber) {
-  toggleDisplay(".ispinner");
-
   const accessToken = localStorage.getItem("access_token");
 
   let callCount = Math.floor(itemNumber / 50);
@@ -107,7 +104,6 @@ async function getMultiplePlaylists(itemNumber) {
       })
       .then((data) => {
         // localStorage.setItem(`trackData`, JSON.stringify(data));
-        console.log(JSON.stringify(data));
         handleLikedSongsResponse(data, i);
       })
       .catch((error) => {
@@ -117,7 +113,6 @@ async function getMultiplePlaylists(itemNumber) {
     offset += 50;
     itemNumber -= 50;
   }
-  toggleDisplay(".ispinner");
 }
 
 /**
@@ -130,38 +125,11 @@ async function getMultiplePlaylists(itemNumber) {
  * Additional: in general if you see something that is a separate functionality (i.e. create song table item or change loader spinner status -> create separate function which works and just call it)
  */
 
-function handleLikedSongsResponse(data, timesCalled = 0) {
+function handleLikedSongsResponse(data) {
   const songs = data.items;
   const tableDiv = document.querySelector(".song-display");
-  // if (tableDiv.hasChildNodes()) {
-  //   tableDiv.removeChild(tableDiv.firstChild);
-  // }
   const table = document.getElementById("table-element");
   const tableBody = document.getElementById("table-body");
-  console.log(table);
-  // if (timesCalled == 0) {
-  //   // table = document.createElement("table");
-  //   // tableBody = document.createElement("tbody");
-  //   const tableHeader = document.createElement("thead");
-  //   const tableHeadElements = [
-  //     "Album Cover",
-  //     "Artist",
-  //     "Song Name",
-  //     "Album",
-  //     "Date Added",
-  //     "Duration",
-  //     "",
-  //   ];
-  //   tableHeadElements.forEach((element) => {
-  //     const tableHead = document.createElement("th");
-  //     tableHead.appendChild(document.createTextNode(element));
-  //     tableHeader.appendChild(tableHead);
-  //     table.appendChild(tableHeader);
-  //   });
-  // } else {
-  //   table = tableDiv.getElementsByTagName("table");
-  //   tableBody = tableDiv.getElementsByTagName("tbody");
-  // }
 
   songs.forEach((element) => {
     let albumCover = element.track.album.images[2].url;
@@ -207,7 +175,8 @@ function handleLikedSongsResponse(data, timesCalled = 0) {
     tableBody.appendChild(tableRow);
     table.appendChild(tableBody);
     tableDiv.appendChild(table);
-    toggleDisplay(".ispinner");
+    // toggleDisplay(".ispinner");
+    // toggleDisplay(".table-element");
   });
 }
 
@@ -220,7 +189,9 @@ function clearTable() {
   newTableBody.setAttribute("id", "table-body");
 
   table.appendChild(newTableBody);
-  toggleDisplay(".table-element");
+  if (table.style.display == "block") {
+    toggleDisplay(".table-element");
+  }
 }
 
 //Pagination implementation

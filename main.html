@@ -7,53 +7,60 @@
     <link
       rel="stylesheet"
       media="all"
-      href="ispinner-master/ispinner.prefixed.css"
+      href="/ispinner-master/ispinner.prefixed.css"
     />
-    <link rel="stylesheet" href="main-styles.css" />
+    <link rel="stylesheet" href="./src/main-styles.css" />
+    <link href="./dist/output.css" rel="stylesheet" />
   </head>
   <body>
-    <h1>Figma</h1>
-    <form id="APIForm">
-      <label for="itemNumber"
-        >Enter number of songs you would like to request:</label
-      >
-      <input
-        type="number"
-        id="itemNumber"
-        min="1"
-        placeholder="Enter a number"
-      />
-      <button class="playlists-button" type="submit">Get Liked Songs</button>
-    </form>
-    <button class="log-out-button" type="button" onclick="clientLogOut()">
-      Log Out
-    </button>
-    <button class="clear-button" type="button" onclick="clearTable()">
-      Clear
-    </button>
-    <div class="ispinner ispinner-large" style="display: none">
-      <div class="ispinner-blade"></div>
-      <div class="ispinner-blade"></div>
-      <div class="ispinner-blade"></div>
-      <div class="ispinner-blade"></div>
-      <div class="ispinner-blade"></div>
-      <div class="ispinner-blade"></div>
-      <div class="ispinner-blade"></div>
-      <div class="ispinner-blade"></div>
-    </div>
-    <div class="song-display" id="paginated-list" aria-live="polite">
-      <table id="table-element" class="table-element" style="display: none">
-        <thead>
-          <th>Album Cover</th>
-          <th>Artist</th>
-          <th>Song Name</th>
-          <th>Album</th>
-          <th>Date Added</th>
-          <th>Duration</th>
-          <th></th>
-        </thead>
-        <tbody id="table-body"></tbody>
-      </table>
+    <div class="mx-auto bg-gray-300 max-w-xl">
+      <h1 class="">Figma</h1>
+      <div class="max-w-md mx-auto bg-grey rounded-xl flex items-center">
+        <form id="APIForm">
+          <label for="itemNumber"
+            >Enter number of songs you would like to request:</label
+          >
+          <input
+            type="number"
+            id="itemNumber"
+            min="1"
+            placeholder="Enter a number"
+          />
+          <button class="playlists-button" type="submit">
+            Get Liked Songs
+          </button>
+        </form>
+        <button class="log-out-button" type="button" onclick="clientLogOut()">
+          Log Out
+        </button>
+        <button class="clear-button" type="button" onclick="clearTable()">
+          Clear
+        </button>
+      </div>
+      <div class="ispinner ispinner-large" style="display: none">
+        <div class="ispinner-blade"></div>
+        <div class="ispinner-blade"></div>
+        <div class="ispinner-blade"></div>
+        <div class="ispinner-blade"></div>
+        <div class="ispinner-blade"></div>
+        <div class="ispinner-blade"></div>
+        <div class="ispinner-blade"></div>
+        <div class="ispinner-blade"></div>
+      </div>
+      <div class="song-display" id="paginated-list" aria-live="polite">
+        <table id="table-element" class="table-element" style="display: none">
+          <thead>
+            <th>Album Cover</th>
+            <th>Artist</th>
+            <th>Song Name</th>
+            <th>Album</th>
+            <th>Date Added</th>
+            <th>Duration</th>
+            <th></th>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
     </div>
     <script src="main.js"></script>
   </body>
