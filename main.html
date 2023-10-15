@@ -13,11 +13,50 @@
     <link href="./dist/output.css" rel="stylesheet" />
   </head>
   <body>
-    <div class="mx-auto bg-gray-300 max-w-xl">
-      <h1 class="">Figma</h1>
-      <div class="max-w-md mx-auto bg-grey rounded-xl flex items-center">
-        <form id="APIForm">
-          <label for="itemNumber"
+    <nav>
+      <div
+        class="sticky max-w-none bg-primary flex justify-between items-stretch"
+      >
+        <a href="#" class="ml-7 m-4"
+          ><img src="" id="profile-picture" class="rounded-2xl"
+        /></a>
+        <h1 class="text-2xl font-normal self-center" id="profile-name"></h1>
+        <div class="relative min-h-full" id="dropdown-container">
+          <button
+            id="button-dropdown"
+            class="p-5 px-10 bg-primary min-h-full hover:bg-secondary"
+          >
+            Menu
+          </button>
+          <div
+            id="menu-dropdown"
+            class="absolute bg-black z-2 w-full overflow-auto"
+          >
+            <button class="p-5 bg-secondary w-full" type="button">
+              Profile
+            </button>
+            <button
+              class="p-5 text-center bg-secondary w-full"
+              type="button"
+              onclick="clearTable()"
+            >
+              Clear
+            </button>
+            <button
+              class="p-5 bg-secondary text-center w-full"
+              type="button"
+              onclick="clientLogOut()"
+            >
+              Log Out
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="bg-background flex flex-col min-h-screen text-white">
+      <div class="mx-auto max-w-none bg-grey flex flex-col">
+        <form id="APIForm" class="flex flex-col my-5">
+          <label for="itemNumber" class="my-1"
             >Enter number of songs you would like to request:</label
           >
           <input
@@ -25,17 +64,12 @@
             id="itemNumber"
             min="1"
             placeholder="Enter a number"
+            class="my-2 text-black"
           />
-          <button class="playlists-button" type="submit">
+          <button class="playlists-button max-w-sm bg-secondary" type="submit">
             Get Liked Songs
           </button>
         </form>
-        <button class="log-out-button" type="button" onclick="clientLogOut()">
-          Log Out
-        </button>
-        <button class="clear-button" type="button" onclick="clearTable()">
-          Clear
-        </button>
       </div>
       <div class="ispinner ispinner-large" style="display: none">
         <div class="ispinner-blade"></div>
@@ -47,10 +81,14 @@
         <div class="ispinner-blade"></div>
         <div class="ispinner-blade"></div>
       </div>
-      <div class="song-display" id="paginated-list" aria-live="polite">
-        <table id="table-element" class="table-element" style="display: none">
-          <thead>
-            <th>Album Cover</th>
+      <div
+        class="song-display w-full py-6 align-middle"
+        id="paginated-list"
+        aria-live="polite"
+      >
+        <table id="table-element" class="table-element table-fixed min-w-full">
+          <thead class="border-b">
+            <th class="">Album Cover</th>
             <th>Artist</th>
             <th>Song Name</th>
             <th>Album</th>

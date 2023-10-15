@@ -2,32 +2,27 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-.pagination-container {
-  position: absolute;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+@font-face {
+  font-family: "montserratthin";
+  src: url("/src/Montserrat-Italic-VariableFont_wght.ttf") format("truetype"),
+    url("/src/Montserrat-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 1000;
+  font-style: normal;
+}
+@layer base {
+  html {
+    font-family: "montserratthin";
+  }
 }
 
-.pagination-number,
-.pagination-button {
-  font-size: 1.1rem;
-  background-color: transparent;
-  border: none;
-  margin: 0.25rem 0.25rem;
-  cursor: pointer;
-  height: 2.5rem;
-  width: 2.5rem;
-  border-radius: 0.2rem;
+#dropdown-container #menu-dropdown {
+  display: none;
 }
 
-.pagination-number:hover,
-.pagination-button:not(.disabled):hover {
-  background: #fff;
+#dropdown-container.active #menu-dropdown {
+  display: block;
 }
 
-.pagination-number.active {
-  color: #fff;
-  background-color: #0085b6;
+#dropdown-container.active #button-dropdown {
+  background-color: #6d8b74;
 }

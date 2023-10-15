@@ -2,6 +2,8 @@ function checkUserAuthorization() {
   let accessToken = localStorage.getItem("access_token");
   if (!accessToken) {
     window.location.href = "./index.html";
+  } else {
+    getProfile();
   }
 }
 
@@ -12,6 +14,19 @@ function toggleDisplay(selector) {
   } else {
     element.style.display = "none";
   }
+}
+
+function toggleDropdownDisplayOnHover() {
+  const buttonElement = document.querySelector("#button-dropdown");
+  const containerElement = document.querySelector("#dropdown-container");
+  const dropdownElement = document.querySelector("#menu-dropdown");
+
+  buttonElement.addEventListener("mouseover", function () {
+    containerElement.classList.add("active");
+  });
+  document.addEventListener("click", function () {
+    containerElement.classList.remove("active");
+  });
 }
 
 function clientLogOut() {
@@ -34,8 +49,29 @@ document.getElementById("APIForm").addEventListener("submit", function (event) {
     clearTable();
     getMultiplePlaylists(itemNumber);
   }
-  toggleDisplay(".table-element");
 });
+
+async function getProfile() {
+  const accessToken = localStorage.getItem("access_token");
+
+  const callURL = "https://api.spotify.com/v1/me";
+
+  fetch(callURL, {
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+      handleProfileData(data);
+    })
+    .catch((error) => {
+      console.error("Error fetching profile data", error);
+    });
+}
 
 async function getPlaylists(itemNumber, offset = 0) {
   const accessToken = localStorage.getItem("access_token");
@@ -64,7 +100,7 @@ async function getPlaylists(itemNumber, offset = 0) {
       handleLikedSongsResponse(data);
     })
     .catch((error) => {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching playlist data:", error);
     });
 }
 
@@ -180,6 +216,16 @@ function handleLikedSongsResponse(data) {
   });
 }
 
+function handleProfileData(data) {
+  const userName = data.display_name;
+  const userProfilePicture = data.images[0].url;
+  const userNameField = document.getElementById("profile-name");
+  const userPictureField = document.getElementById("profile-picture");
+
+  userNameField.textContent = `Hello, ${userName}!`;
+  userPictureField.setAttribute("src", userProfilePicture);
+}
+
 function clearTable() {
   const oldTableBody = document.getElementById("table-body");
   oldTableBody.remove("tr");
@@ -189,11 +235,12 @@ function clearTable() {
   newTableBody.setAttribute("id", "table-body");
 
   table.appendChild(newTableBody);
-  if (table.style.display == "block") {
-    toggleDisplay(".table-element");
-  }
 }
 
 //Pagination implementation
 
-window.addEventListener("load", checkUserAuthorization());
+window.addEventListener(
+  "load",
+  checkUserAuthorization(),
+  toggleDropdownDisplayOnHover()
+);

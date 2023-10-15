@@ -37,7 +37,8 @@ const codeVerifier = generateRandomString(128);
 function handleAuthorizeClick() {
   generateCodeChallenge(codeVerifier).then((codeChallenge) => {
     let state = generateRandomString(16);
-    let scope = "user-library-read";
+    let scope =
+      "user-library-read playlist-read-private user-read-email user-read-private";
 
     localStorage.setItem("code_verifier", codeVerifier);
 

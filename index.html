@@ -2,31 +2,48 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="/src/main-styles.css" rel="stylesheet" />
-    <link href="./dist/output.css" rel="stylesheet" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale
+    =1.0"
+    />
+    <link href="./src/main-styles.css" type="text/css" rel="stylesheet" />
+    <link href="./dist/output.css" type="text/css" rel="stylesheet" />
     <!-- <script src="script.js"></script>
     <script src="test.js"></script> -->
     <title>Document</title>
   </head>
   <body>
     <div
-      class="page-wrapper max-w-lg flex align-middle justify-center flex-col p-24 h-screen"
+      class="h-screen w-full flex flex-col items-center justify-center bg-background"
     >
       <div class="">
-        <h1 class="text-lgr text-6xl">Musify</h1>
+        <h1 class="text-lgr text-7xl text-white font-thin">Muzify</h1>
+      </div>
+      <div
+        class="text-center text-s my-8 mx-32 text-white font-extralight break-words"
+      >
+        <p>
+          To use this application you must grant access permission to Spotify
+          data and services.
+        </p>
       </div>
       <div class="authorize">
         <button
-          class="authorize-button p-10"
+          class="authorize-button px-8 py-3 rounded-md shrink-0 bg-primary text-white"
           type="button"
           onclick="handleAuthorizeClick()"
         >
           Connect to Spotify
         </button>
+        <p
+          class="flex justify-center text-center flex-shrink-0 my-7 text-white font-thin"
+        >
+          Powered by<img src="/icons/spotify.svg" class="inline mx-3" />
+        </p>
       </div>
     </div>
     <script src="script.js"></script>
-    <script src="api.js" />
+    <script src="api.js"></script>
   </body>
 </html>
