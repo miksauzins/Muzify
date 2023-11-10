@@ -29,6 +29,15 @@ function toggleDropdownDisplayOnHover() {
   });
 }
 
+async function listenPlaylistChoice() {
+  const dropDownChoice = document.querySelector("#playlistDropDown").value;
+  if (dropDownChoice != "noneSelected") {
+    const data = await getPlaylistData(dropDownChoice);
+    loadPlaylistData(data);
+    clearTable();
+  }
+}
+
 function clientLogOut() {
   localStorage.clear();
   window.location.href = "./index.html";
@@ -38,16 +47,17 @@ document.getElementById("APIForm").addEventListener("submit", function (event) {
   event.preventDefault();
 
   const itemNumber = document.getElementById("itemNumber").value;
+  const chosenPlaylist = document.querySelector("#playlistDropDown").value;
 
   if (itemNumber <= 0) {
     alert("Please enter a valid number greater than 0.");
     return;
-  } else if (itemNumber <= 50) {
-    clearTable();
-    getPlaylists(itemNumber);
+  } else if (chosenPlaylist == "noneSelected") {
+    alert("Please choose a playlist.");
+    return;
   } else {
     clearTable();
-    getMultiplePlaylists(itemNumber);
+    GetPlaylistTracks(itemNumber, chosenPlaylist);
   }
 });
 
@@ -65,7 +75,6 @@ async function getProfile() {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
       handleProfileData(data);
     })
     .catch((error) => {
@@ -73,19 +82,30 @@ async function getProfile() {
     });
 }
 
-async function getPlaylists(itemNumber, offset = 0) {
+async function getPlaylistData(playlistID) {
   const accessToken = localStorage.getItem("access_token");
+  const callURL = "https://api.spotify.com/v1/playlists/" + playlistID;
 
-  // if (itemNumber > 50) {
-  //   itemNumber = 50;
-  // }
+  return fetch(callURL, {
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+      return data;
+    })
+    .catch((error) => {
+      console.error("Error fetching playlist data", error);
+    });
+}
 
-  const callURL =
-    "https://api.spotify.com/v1/me/tracks" +
-    "?limit=" +
-    itemNumber +
-    "&offset=" +
-    offset;
+async function getPlaylists() {
+  const accessToken = localStorage.getItem("access_token");
+  const callURL = "https://api.spotify.com/v1/me/playlists?limit=50";
 
   fetch(callURL, {
     headers: {
@@ -96,15 +116,15 @@ async function getPlaylists(itemNumber, offset = 0) {
       return response.json();
     })
     .then((data) => {
-      // localStorage.setItem("trackData", JSON.stringify(data));
-      handleLikedSongsResponse(data);
+      // console.log(data);
+      handlePlaylistResponse(data);
     })
     .catch((error) => {
-      console.error("Error fetching playlist data:", error);
+      console.error("Error fetching playlist data", error);
     });
 }
 
-async function getMultiplePlaylists(itemNumber) {
+async function GetPlaylistTracks(itemNumber, playlistID) {
   const accessToken = localStorage.getItem("access_token");
 
   let callCount = Math.floor(itemNumber / 50);
@@ -124,7 +144,9 @@ async function getMultiplePlaylists(itemNumber) {
     }
 
     const callURL =
-      "https://api.spotify.com/v1/me/tracks" +
+      "https://api.spotify.com/v1/playlists/" +
+      playlistID +
+      "/tracks" +
       "?limit=" +
       countToCall +
       "&offset=" +
@@ -139,8 +161,8 @@ async function getMultiplePlaylists(itemNumber) {
         return response.json();
       })
       .then((data) => {
-        // localStorage.setItem(`trackData`, JSON.stringify(data));
-        handleLikedSongsResponse(data, i);
+        localStorage.setItem(`trackData`, JSON.stringify(data));
+        handlePlaylistSongsResponse(data, i);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -151,17 +173,48 @@ async function getMultiplePlaylists(itemNumber) {
   }
 }
 
-/**
- * TODO:
- *    1) refactor times called out of handleLikedSongsResponse -> do this check one function up where it is called
- *    2) factor in a separate function song table item creation / maybe create additional removal function
- *    3) table will always be on page -> do not create dynamically things that will most probably always be there
- *    4) create separate function that manages loader spinner state (toggleSpinner(state))
- *
- * Additional: in general if you see something that is a separate functionality (i.e. create song table item or change loader spinner status -> create separate function which works and just call it)
- */
+function loadPlaylistData(data) {
+  const imageElement = document.querySelector("#playlistImage");
+  const nameElement = document.querySelector("#playlistName");
+  const infoElement = document.querySelector("#playlistInfo");
+  const linkElement = document.querySelector("#playlistLink");
 
-function handleLikedSongsResponse(data) {
+  const playlistName = data.name;
+  const playlistInfo = data.description;
+  const playlistImage = data.images[0].url;
+  const playlistLink = data.external_urls.spotify;
+  const trackAmount = data.tracks.total;
+  const playlistID = data.id;
+
+  GetPlaylistTracks(trackAmount, playlistID);
+  nameElement.textContent = playlistName;
+  imageElement.setAttribute("src", playlistImage);
+  linkElement.setAttribute("href", playlistLink);
+  linkElement.style.display = "block";
+  if (playlistInfo == "") {
+    infoElement.textContent =
+      "Author has not given any information about this playlist :'(";
+  } else {
+    infoElement.textContent = playlistInfo;
+  }
+}
+
+function handlePlaylistResponse(data) {
+  const playlists = data.items;
+  const playlistDropDown = document.querySelector("#playlistDropDown");
+
+  playlists.forEach((element) => {
+    const playlistName = element.name;
+    const playlistID = element.id;
+    const dropDownOption = document.createElement("option");
+
+    dropDownOption.textContent = playlistName;
+    dropDownOption.setAttribute("value", playlistID);
+    playlistDropDown.appendChild(dropDownOption);
+  });
+}
+
+function handlePlaylistSongsResponse(data) {
   const songs = data.items;
   const tableDiv = document.querySelector(".song-display");
   const table = document.getElementById("table-element");
@@ -173,6 +226,9 @@ function handleLikedSongsResponse(data) {
     let songName = element.track.name;
     let albumName = element.track.album.name;
     let dateAdded = element.added_at.slice(0, 10);
+    if (dateAdded == "1970-01-01") {
+      dateAdded = "";
+    }
     let durationMS = element.track.duration_ms;
     const durationDate = new Date(durationMS);
     let duration = durationDate.getMinutes() + ":";
@@ -211,8 +267,6 @@ function handleLikedSongsResponse(data) {
     tableBody.appendChild(tableRow);
     table.appendChild(tableBody);
     tableDiv.appendChild(table);
-    // toggleDisplay(".ispinner");
-    // toggleDisplay(".table-element");
   });
 }
 
@@ -239,8 +293,10 @@ function clearTable() {
 
 //Pagination implementation
 
+//Initial page load checks for authorization, gets necessary information for page.
 window.addEventListener(
   "load",
   checkUserAuthorization(),
-  toggleDropdownDisplayOnHover()
+  toggleDropdownDisplayOnHover(),
+  getPlaylists()
 );
