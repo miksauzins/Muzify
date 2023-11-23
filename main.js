@@ -43,24 +43,6 @@ function clientLogOut() {
   window.location.href = "./index.html";
 }
 
-document.getElementById("APIForm").addEventListener("submit", function (event) {
-  event.preventDefault();
-
-  const itemNumber = document.getElementById("itemNumber").value;
-  const chosenPlaylist = document.querySelector("#playlistDropDown").value;
-
-  if (itemNumber <= 0) {
-    alert("Please enter a valid number greater than 0.");
-    return;
-  } else if (chosenPlaylist == "noneSelected") {
-    alert("Please choose a playlist.");
-    return;
-  } else {
-    clearTable();
-    GetPlaylistTracks(itemNumber, chosenPlaylist);
-  }
-});
-
 async function getProfile() {
   const accessToken = localStorage.getItem("access_token");
 
@@ -299,23 +281,39 @@ function paginateItems() {
   // const tbody = table.getElementsByTagName("tbody");
   const tableBody = document.getElementById("table-body");
 
+  const sortOptions = document.getElementsByName("pageAmount");
+  let amountToShow = 0;
+  for (let i = 0; i < sortOptions.length; i++) {
+    if (sortOptions[i].checked) {
+      amountToShow = Number.parseInt(sortOptions[i].value);
+    }
+  }
+
   let arrayOfSongs = [];
-  const amountToShow = 25;
 
   for (let row of tableBody.rows) {
     arrayOfSongs.push(row);
   }
+  const topBackButton = document.getElementById("topPaginateBackButton");
+  const topNextButton = document.getElementById("topPaginateNextButton");
+  const botBackButton = document.getElementById("botPaginateBackButton");
+  const botNextButton = document.getElementById("botPaginateNextButton");
 
-  const backButton = document.getElementById("paginateBackButton");
-  backButton.style.display = "block";
-  const nextButton = document.getElementById("paginateNextButton");
-  nextButton.style.display = "block";
+  const pageCounter = document.getElementById("topPageNumber");
+  const botPageCounter = document.getElementById("botPageNumber");
 
-  const pageCounter = document.getElementById("pageNumber");
-  pageCounter.style.display = "block";
+  if (amountToShow < 1000 && amountToShow < arrayOfSongs.length) {
+    topBackButton.style.display = "block";
+    topNextButton.style.display = "block";
+    botBackButton.style.display = "block";
+    botNextButton.style.display = "block";
+    pageCounter.style.display = "block";
+    botPageCounter.style.display = "block";
+  }
   let currentPage = 0;
   tableBody.setAttribute("value", currentPage);
   pageCounter.innerHTML = currentPage + 1;
+  botPageCounter.innerHTML = currentPage + 1;
 
   for (let i = 0; i < arrayOfSongs.length; i++) {
     if (i >= amountToShow) {
@@ -326,9 +324,17 @@ function paginateItems() {
 
 function changePage(page) {
   const tableBody = document.getElementById("table-body");
-  const pageCounter = document.getElementById("pageNumber");
+  const topPageCounter = document.getElementById("topPageNumber");
+  const botPageCounter = document.getElementById("botPageNumber");
   let arrayOfSongs = [];
-  const amountToShow = 25;
+
+  const sortOptions = document.getElementsByName("pageAmount");
+  let amountToShow = 0;
+  for (let i = 0; i < sortOptions.length; i++) {
+    if (sortOptions[i].checked) {
+      amountToShow = Number.parseInt(sortOptions[i].value);
+    }
+  }
 
   for (let row of tableBody.rows) {
     arrayOfSongs.push(row);
@@ -343,7 +349,9 @@ function changePage(page) {
   }
 
   const startIndex = currentPage * amountToShow;
+  console.log(startIndex);
   const endIndex = startIndex + amountToShow;
+  console.log(endIndex);
 
   for (let i = 0; i < arrayOfSongs.length; i++) {
     if (i >= startIndex && i < endIndex) {
@@ -353,7 +361,8 @@ function changePage(page) {
     }
   }
   tableBody.setAttribute("value", currentPage);
-  pageCounter.innerHTML = currentPage + 1;
+  topPageCounter.innerHTML = currentPage + 1;
+  botPageCounter.innerHTML = currentPage + 1;
 }
 
 //Initial page load checks for authorization, gets necessary information for page.

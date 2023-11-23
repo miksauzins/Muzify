@@ -83,35 +83,76 @@
               <option value="noneSelected"></option>
             </select>
           </form>
-          <form id="APIForm" class="flex flex-col my-5">
-            <label for="itemNumber" class="my-1"
-              >Enter number of songs you would like to request:</label
-            >
-            <input
-              type="number"
-              id="itemNumber"
-              min="1"
-              placeholder="Enter a number"
-              class="my-2 text-black"
-            />
-            <button
-              class="playlists-button max-w-sm bg-secondary"
-              type="submit"
-            >
-              Get Liked Songs
-            </button>
-          </form>
+          <form id="pageAmount" class="flex flex-col my-5">
+            <legend class="my-1">Select number of songs per page :</legend>
+            <div class="flex justify-normal">
+              <input
+                type="radio"
+                id="amountToShow1"
+                name="pageAmount"
+                class="mx-3 text-black checked:bg-secondary hover:bg-accent"
+                value="10"
+                checked
+              />
+              <label for="tenItem">10</label>
+              <input
+                type="radio"
+                id="amountToShow2"
+                name="pageAmount"
+                class="mx-3 text-black"
+                value="25"
+              />
+              <label for="twentyFiveItem">25</label>
+              <input
+                type="radio"
+                id="amountToShow3"
+                name="pageAmount"
+                class="mx-3 text-black"
+                value="50"
+              />
+              <label for="twentyFiveItem">50</label>
+              <input
+                type="radio"
+                id="amountToShow4"
+                name="pageAmount"
+                class="mx-3 text-black"
+                value="9999"
+              />
+              <label for="allItem">All</label>
+            </form>
+          </div>
+          <button
+            class="w-full bg-secondary"
+            id="refresh"
+            type="submit"
+          >
+            Get Liked Songs
+          </button>
         </div>
       </div>
-      <div class="ispinner ispinner-large" style="display: none">
-        <div class="ispinner-blade"></div>
-        <div class="ispinner-blade"></div>
-        <div class="ispinner-blade"></div>
-        <div class="ispinner-blade"></div>
-        <div class="ispinner-blade"></div>
-        <div class="ispinner-blade"></div>
-        <div class="ispinner-blade"></div>
-        <div class="ispinner-blade"></div>
+      <div class="inline-flex justify-end pr-16">
+        <button
+          class="bg-primaryDark hover:bg-primaryLight text-gray-800 font-bold py-2 px-4"
+          id="topPaginateBackButton"
+          onclick="changePage(-1)"
+          style="display: none"
+          ;
+        >
+          <<
+        </button>
+        <p
+          id="topPageNumber"
+          class="bg-primaryDark text-white py-2 px-4"
+          style="display: none"
+        ></p>
+        <button
+          class="bg-primaryDark hover:bg-primaryLight text-gray-800 font-bold py-2 px-4"
+          id="topPaginateNextButton"
+          onclick="changePage(1)"
+          style="display: none"
+        >
+          >>
+        </button>
       </div>
       <div
         class="song-display w-full py-6 px-4 align-middle"
@@ -137,7 +178,7 @@
       <div class="inline-flex justify-center items-center">
         <button
           class="bg-primaryDark hover:bg-primaryLight text-gray-800 font-bold py-2 px-4"
-          id="paginateBackButton"
+          id="botPaginateBackButton"
           onclick="changePage(-1)"
           style="display: none"
           ;
@@ -145,13 +186,13 @@
           <<
         </button>
         <p
-          id="pageNumber"
+          id="botPageNumber"
           class="bg-primaryDark text-white py-2 px-4"
           style="display: none"
         ></p>
         <button
           class="bg-primaryDark hover:bg-primaryLight text-gray-800 font-bold py-2 px-4"
-          id="paginateNextButton"
+          id="botPaginateNextButton"
           onclick="changePage(1)"
           style="display: none"
         >
