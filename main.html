@@ -134,6 +134,30 @@
           <tbody id="table-body"></tbody>
         </table>
       </div>
+      <div class="inline-flex justify-center items-center">
+        <button
+          class="bg-primaryDark hover:bg-primaryLight text-gray-800 font-bold py-2 px-4"
+          id="paginateBackButton"
+          onclick="changePage(-1)"
+          style="display: none"
+          ;
+        >
+          <<
+        </button>
+        <p
+          id="pageNumber"
+          class="bg-primaryDark text-white py-2 px-4"
+          style="display: none"
+        ></p>
+        <button
+          class="bg-primaryDark hover:bg-primaryLight text-gray-800 font-bold py-2 px-4"
+          id="paginateNextButton"
+          onclick="changePage(1)"
+          style="display: none"
+        >
+          >>
+        </button>
+      </div>
     </div>
     <script src="main.js"></script>
   </body>
