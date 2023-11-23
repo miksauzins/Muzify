@@ -173,7 +173,7 @@ async function GetPlaylistTracks(itemNumber, playlistID) {
   }
 }
 
-function loadPlaylistData(data) {
+async function loadPlaylistData(data) {
   const imageElement = document.querySelector("#playlistImage");
   const nameElement = document.querySelector("#playlistName");
   const infoElement = document.querySelector("#playlistInfo");
@@ -186,7 +186,7 @@ function loadPlaylistData(data) {
   const trackAmount = data.tracks.total;
   const playlistID = data.id;
 
-  GetPlaylistTracks(trackAmount, playlistID);
+  await GetPlaylistTracks(trackAmount, playlistID);
   nameElement.textContent = playlistName;
   imageElement.setAttribute("src", playlistImage);
   linkElement.setAttribute("href", playlistLink);
@@ -197,6 +197,7 @@ function loadPlaylistData(data) {
   } else {
     infoElement.textContent = playlistInfo;
   }
+  paginateItems();
 }
 
 function handlePlaylistResponse(data) {
@@ -243,6 +244,7 @@ function handlePlaylistSongsResponse(data) {
     let trackItems = [artist, songName, albumName, dateAdded, duration];
 
     const tableRow = document.createElement("tr");
+    tableRow.setAttribute("class", "hover:bg-primaryDark");
     const tableCell = document.createElement("td");
     const img = document.createElement("img");
     img.src = albumCover;
@@ -292,6 +294,67 @@ function clearTable() {
 }
 
 //Pagination implementation
+function paginateItems() {
+  // const table = document.getElementById("table-element");
+  // const tbody = table.getElementsByTagName("tbody");
+  const tableBody = document.getElementById("table-body");
+
+  let arrayOfSongs = [];
+  const amountToShow = 25;
+
+  for (let row of tableBody.rows) {
+    arrayOfSongs.push(row);
+  }
+
+  const backButton = document.getElementById("paginateBackButton");
+  backButton.style.display = "block";
+  const nextButton = document.getElementById("paginateNextButton");
+  nextButton.style.display = "block";
+
+  const pageCounter = document.getElementById("pageNumber");
+  pageCounter.style.display = "block";
+  let currentPage = 0;
+  tableBody.setAttribute("value", currentPage);
+  pageCounter.innerHTML = currentPage + 1;
+
+  for (let i = 0; i < arrayOfSongs.length; i++) {
+    if (i >= amountToShow) {
+      arrayOfSongs[i].style.display = "none";
+    }
+  }
+}
+
+function changePage(page) {
+  const tableBody = document.getElementById("table-body");
+  const pageCounter = document.getElementById("pageNumber");
+  let arrayOfSongs = [];
+  const amountToShow = 25;
+
+  for (let row of tableBody.rows) {
+    arrayOfSongs.push(row);
+  }
+
+  let currentPage = Number.parseInt(tableBody.getAttribute("value"));
+  let lastPage = Math.ceil(arrayOfSongs.length / amountToShow) - 1;
+  if (page > 0 && currentPage != lastPage) {
+    currentPage += 1;
+  } else if (page < 0 && currentPage != 0) {
+    currentPage -= 1;
+  }
+
+  const startIndex = currentPage * amountToShow;
+  const endIndex = startIndex + amountToShow;
+
+  for (let i = 0; i < arrayOfSongs.length; i++) {
+    if (i >= startIndex && i < endIndex) {
+      arrayOfSongs[i].style.display = "table-row";
+    } else {
+      arrayOfSongs[i].style.display = "none";
+    }
+  }
+  tableBody.setAttribute("value", currentPage);
+  pageCounter.innerHTML = currentPage + 1;
+}
 
 //Initial page load checks for authorization, gets necessary information for page.
 window.addEventListener(
