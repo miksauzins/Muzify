@@ -110,7 +110,7 @@
                 class="mx-3 text-black"
                 value="50"
               />
-              <label for="twentyFiveItem">50</label>
+              <label for="fiftyItem">50</label>
               <input
                 type="radio"
                 id="amountToShow4"
@@ -124,9 +124,9 @@
           <button
             class="w-full bg-secondary"
             id="refresh"
-            type="submit"
+            onclick="downloadCSV()"
           >
-            Get Liked Songs
+            Export to CSV
           </button>
         </div>
       </div>
@@ -163,7 +163,7 @@
           id="table-element"
           class="table-element table-fixed min-w-full px-3 text-left"
         >
-          <thead class="border-b">
+          <thead class="border-b" id="table-head">
             <th class="">Album Cover</th>
             <th>Artist</th>
             <th>Song Name</th>

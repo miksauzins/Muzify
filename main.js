@@ -365,6 +365,40 @@ function changePage(page) {
   botPageCounter.innerHTML = currentPage + 1;
 }
 
+function downloadCSV() {
+  const table = document.getElementById("table-element");
+
+  let rows = [];
+  for (let i = 0; i < table.rows.length; i++) {
+    let row = [];
+    for (let j = 1; j < table.rows[i].cells.length; j++) {
+      if (j + 1 == table.rows[i].cells.length) {
+        console.log(
+          table.rows[i].cells[j].querySelector("a").getAttribute("href")
+        );
+        row.push(table.rows[i].cells[j].href);
+        continue;
+      }
+      row.push(table.rows[i].cells[j].innerText);
+    }
+    rows.push(row.join(","));
+  }
+
+  let csvContent = rows.join("\n");
+
+  let blob = new Blob([csvContent], { type: "text/csv" });
+
+  let link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = document.getElementById("playlistName").innerHTML + ".csv";
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+}
+
 //Initial page load checks for authorization, gets necessary information for page.
 window.addEventListener(
   "load",
