@@ -7,6 +7,10 @@ function checkUserAuthorization() {
   }
 }
 
+function redirectUser(page) {
+  window.location.href = "./" + page;
+}
+
 function toggleDisplay(selector) {
   const element = document.querySelector(selector);
   if (element.style.display == "none") {
@@ -260,7 +264,14 @@ function handleProfileData(data) {
   const userNameField = document.getElementById("profile-name");
   const userPictureField = document.getElementById("profile-picture");
 
-  userNameField.textContent = `Hello, ${userName}!`;
+  if (window.location.pathname === "/profile.html") {
+    userNameField.textContent = `${userName}'s Profile`;
+    const userImage = document.querySelector("#userImage");
+    const image = data.images[1].url;
+    userImage.setAttribute("src", image);
+  } else {
+    userNameField.textContent = `Welcome to Muzify, ${userName}!`;
+  }
   userPictureField.setAttribute("src", userProfilePicture);
 }
 
@@ -369,17 +380,18 @@ function downloadCSV() {
   const table = document.getElementById("table-element");
 
   let rows = [];
-  for (let i = 0; i < table.rows.length; i++) {
+  const csvHeadings = [
+    "Artist",
+    "Song Name",
+    "Album",
+    "Date Added",
+    "Duration",
+  ];
+  rows.push(csvHeadings.join(","));
+  for (let i = 1; i < table.rows.length; i++) {
     let row = [];
-    for (let j = 1; j < table.rows[i].cells.length; j++) {
-      if (j + 1 == table.rows[i].cells.length) {
-        console.log(
-          table.rows[i].cells[j].querySelector("a").getAttribute("href")
-        );
-        row.push(table.rows[i].cells[j].href);
-        continue;
-      }
-      row.push(table.rows[i].cells[j].innerText);
+    for (let j = 1; j < table.rows[i].cells.length - 1; j++) {
+      row.push("`" + table.rows[i].cells[j].innerText + "`");
     }
     rows.push(row.join(","));
   }
