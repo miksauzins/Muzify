@@ -1,7 +1,7 @@
 function checkUserAuthorization() {
   let accessToken = localStorage.getItem("access_token");
   if (!accessToken) {
-    window.location.href = "./index.html";
+    redirectUser("index.html");
   } else {
     getProfile();
   }
@@ -11,10 +11,10 @@ function redirectUser(page) {
   window.location.href = "./" + page;
 }
 
-function toggleDisplay(selector) {
+function toggleDisplay(selector, displayType = "block") {
   const element = document.querySelector(selector);
   if (element.style.display == "none") {
-    element.style.display = "block";
+    element.style.display = displayType;
   } else {
     element.style.display = "none";
   }
@@ -23,7 +23,6 @@ function toggleDisplay(selector) {
 function toggleDropdownDisplayOnHover() {
   const buttonElement = document.querySelector("#button-dropdown");
   const containerElement = document.querySelector("#dropdown-container");
-  const dropdownElement = document.querySelector("#menu-dropdown");
 
   buttonElement.addEventListener("mouseover", function () {
     containerElement.classList.add("active");
@@ -34,12 +33,44 @@ function toggleDropdownDisplayOnHover() {
 }
 
 async function listenPlaylistChoice() {
+  toggleDisplay("#tableSpinner", "flex");
   const dropDownChoice = document.querySelector("#playlistDropDown").value;
+  const table = document.querySelector("#table-element");
+  const recContainer = document.querySelector("#recommendationListContainer");
+  const recButton = document.querySelector("#recButton");
+  const refreshRecButton = document.querySelector("#refreshRecButton");
+
   if (dropDownChoice != "noneSelected") {
+    // if (table.style.display == "none") {
+    //   table.style.display = "table";
+    // }
+    if (recButton.style.display == "none") {
+      recButton.style.display = "block";
+    }
+    if (recContainer.style.display != "none") {
+      recContainer.style.display = "none";
+      refreshRecButton.style.display = "none";
+    }
+
     const data = await getPlaylistData(dropDownChoice);
     loadPlaylistData(data);
+    toggleDisplay("#tableSpinner");
     clearTable();
+    clearList("#recommendationList");
   }
+}
+
+function reloadPaginatedItems() {
+  // Paginate items with newly set amount of songs to show.
+  paginateItems();
+  reloadTablePage();
+}
+
+function reloadTablePage() {
+  // A way I found to reload elements in the table.
+  // Add 1 and then remove 1 since nothing happens in the called function if page is already 1.
+  changePage(1);
+  changePage(-1);
 }
 
 function clientLogOut() {
@@ -81,7 +112,6 @@ async function getPlaylistData(playlistID) {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
       return data;
     })
     .catch((error) => {
@@ -102,7 +132,6 @@ async function getPlaylists() {
       return response.json();
     })
     .then((data) => {
-      // console.log(data);
       handlePlaylistResponse(data);
     })
     .catch((error) => {
@@ -122,6 +151,8 @@ async function GetPlaylistTracks(itemNumber, playlistID) {
   let CountToCall = 0;
   let offset = 0;
 
+  let fullSongList = [];
+
   for (let i = 0; i < callCount; i++) {
     if (itemNumber > 50) {
       countToCall = 50;
@@ -138,25 +169,296 @@ async function GetPlaylistTracks(itemNumber, playlistID) {
       "&offset=" +
       offset;
 
-    await fetch(callURL, {
+    const response = await fetch(callURL, {
       headers: {
         Authorization: "Bearer " + accessToken,
       },
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        localStorage.setItem(`trackData`, JSON.stringify(data));
-        handlePlaylistSongsResponse(data, i);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+    });
+
+    const playlistSongs = await response.json().catch((error) => {
+      console.error(error);
+    });
+    handlePlaylistSongsResponse(playlistSongs);
+    fullSongList.push(playlistSongs);
 
     offset += 50;
     itemNumber -= 50;
   }
+  if (document.querySelector("#table-element").style.display == "none") {
+    document.querySelector("#table-element").style.display = "table";
+  }
+  sessionStorage.setItem("playlistTracks", JSON.stringify(fullSongList));
+}
+
+//Get several tracks by their IDs, 'ids' should be comma-separated string.
+async function getTracksByIDs(ids) {
+  const accessToken = localStorage.getItem("access_token");
+
+  const callURL = "https://api.spotify.com/v1/tracks?ids=" + ids;
+
+  const songData = await fetch(callURL, {
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      return data;
+    })
+    .catch((error) => {
+      console.error("Error fetching track data", error);
+    });
+  return songData;
+}
+
+async function getRecommendations(data) {
+  const allTracks = data.items;
+  let songIDs = [];
+  allTracks.forEach((trackObject) => {
+    songIDs.push(trackObject.track.id);
+  });
+
+  const accessToken = localStorage.getItem("access_token");
+
+  // Divide array of song ids into multiple chunks consisting of max 5 ids.
+  let chunkSize = 5;
+  let chunkedSongs = [];
+  while (songIDs.length > 0) {
+    chunkedSongs.push(songIDs.splice(0, chunkSize));
+  }
+
+  let resultArray = [];
+  for (const ids of chunkedSongs) {
+    const URLsongs = ids.join(",");
+
+    const callURL =
+      "https://api.spotify.com/v1/recommendations?seed_tracks=" + URLsongs;
+
+    const response = await fetch(callURL, {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    }).catch((error) => {
+      console.error(error);
+    });
+    const result = await response.json();
+    resultArray.push(result);
+  }
+  return resultArray;
+}
+
+function addTrackToPlaylist(trackID) {
+  const accessToken = localStorage.getItem("access_token");
+
+  const playlistID = document.querySelector("#playlistDropDown").value;
+  const trackURI = "spotify:track:" + trackID;
+
+  const callURL =
+    "https://api.spotify.com/v1/playlists/" + playlistID + "/tracks";
+
+  fetch(callURL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + accessToken,
+    },
+    body: JSON.stringify({ uris: [trackURI] }),
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+async function initRecommendations() {
+  toggleDisplay("#recListSpinner", "flex");
+  let recommendationList = [];
+  const playlistSongsArray = JSON.parse(
+    sessionStorage.getItem("playlistTracks")
+  );
+  for (data of playlistSongsArray) {
+    const arr = await getRecommendations(data);
+    recommendationList.push(arr);
+  }
+  let idList = transformRecommendationsIntoIDs(recommendationList);
+  const sortedIdList = sortRecommendations(idList);
+  let sortedIdArray = Object.keys(sortedIdList);
+
+  const retrievableSongs = sortedIdArray.splice(0, 5).join(",");
+  window.sessionStorage.setItem(
+    "RecommendedIDs",
+    JSON.stringify(sortedIdArray)
+  );
+  const songs = await getTracksByIDs(retrievableSongs);
+
+  handleRecommendedSongDisplay(songs);
+
+  toggleDisplay("#recommendationListContainer", "flex");
+  toggleDisplay("#refreshRecButton");
+  toggleDisplay("#recButton");
+}
+
+async function refreshRecommendations() {
+  const remainingIdArray = JSON.parse(
+    window.sessionStorage.getItem("RecommendedIDs")
+  );
+  const retrievableSongs = remainingIdArray.splice(0, 5).join(",");
+  if (retrievableSongs.length == 0) {
+  }
+  const songs = await getTracksByIDs(retrievableSongs);
+  handleRecommendedSongDisplay(songs);
+  window.sessionStorage.setItem(
+    "RecommendedIDs",
+    JSON.stringify(remainingIdArray)
+  );
+}
+
+function clearList(selector) {
+  const listToClear = document.querySelector(selector);
+  while (listToClear.firstChild) {
+    listToClear.removeChild(listToClear.firstChild);
+  }
+}
+
+function handleRecommendedSongDisplay(data) {
+  const tracks = data.tracks;
+  const recommendationListContainer = document.querySelector(
+    "#recommendationListContainer"
+  );
+  let recommendationList = document.querySelector("#recommendationList");
+  clearList("#recommendationList");
+
+  tracks.forEach((songObject) => {
+    const listElement = document.createElement("li");
+    listElement.setAttribute(
+      "class",
+      "px-4 py-1 hover:bg-primary last:border-none border-gray-200 transition-all duration-200 ease-in-out"
+    );
+    const containerDiv = document.createElement("div");
+    containerDiv.setAttribute("class", "flex w-full align-middle");
+
+    const imageElement = document.createElement("img");
+    imageElement.setAttribute("src", songObject.album.images[0].url);
+    imageElement.setAttribute("class", "relative -left-4 h-auto w-14");
+    containerDiv.appendChild(imageElement);
+
+    const informationDiv = document.createElement("div");
+    informationDiv.setAttribute("class", "flex flex-col mx-8");
+
+    const songName = document.createElement("h3");
+    songName.setAttribute("class", "text-lg text-white");
+    songName.textContent = songObject.name;
+    informationDiv.appendChild(songName);
+
+    const songArtist = document.createElement("p");
+    songArtist.setAttribute("class", "text-sm text-neutral");
+    songArtist.textContent = songObject.artists[0].name;
+    informationDiv.appendChild(songArtist);
+    containerDiv.appendChild(informationDiv);
+
+    const actionDiv = document.createElement("div");
+    actionDiv.setAttribute("class", "flex ml-auto mr-5 items-center");
+
+    const songDuration = document.createElement("p");
+    songDuration.setAttribute("class", "text-neutral text-lg");
+
+    let durationMS = songObject.duration_ms;
+    const durationDate = new Date(durationMS);
+    let duration = durationDate.getMinutes() + ":";
+    if (durationDate.getSeconds() < 10) {
+      duration += "0" + durationDate.getSeconds();
+    } else {
+      duration += durationDate.getSeconds();
+    }
+
+    songDuration.textContent = duration;
+    actionDiv.appendChild(songDuration);
+
+    const playButton = document.createElement("button");
+    const playSVG = document.createElement("img");
+    playSVG.setAttribute("src", "icons/play-button.svg");
+    playSVG.setAttribute("class", "w-8 h-auto mx-2");
+    playButton.appendChild(playSVG);
+
+    const audioElement = document.createElement("audio");
+    // audioElement.setAttribute("controls", "");
+    const sourceElement = document.createElement("source");
+    sourceElement.setAttribute("src", songObject.preview_url);
+    sourceElement.setAttribute("type", "audio/mpeg");
+    audioElement.appendChild(sourceElement);
+    playButton.appendChild(audioElement);
+    let isPlaying = false;
+    playButton.addEventListener("click", () => {
+      if (isPlaying) {
+        audioElement.pause();
+      } else {
+        audioElement.play();
+      }
+      isPlaying = !isPlaying;
+    });
+    actionDiv.appendChild(playButton);
+
+    const volumeBar = document.createElement("input");
+    volumeBar.setAttribute("type", "range");
+    volumeBar.setAttribute("min", "0");
+    volumeBar.setAttribute("max", "1");
+    volumeBar.setAttribute("step", "0.01");
+    volumeBar.setAttribute("value", "0.5");
+    volumeBar.setAttribute("class", "mx-2 w-3");
+    volumeBar.setAttribute("title", "Volume Bar");
+    volumeBar.addEventListener("input", () => {
+      audioElement.volume = volumeBar.value;
+    });
+    actionDiv.appendChild(volumeBar);
+
+    const addButton = document.createElement("button");
+    addButton.innerHTML = "Add";
+    const trackID = songObject.id;
+    addButton.setAttribute("onclick", `addTrackToPlaylist("${trackID}")`);
+
+    actionDiv.appendChild(addButton);
+    containerDiv.appendChild(actionDiv);
+
+    listElement.appendChild(containerDiv);
+    recommendationList.appendChild(listElement);
+  });
+  recommendationListContainer.appendChild(recommendationList);
+  toggleDisplay("#recListSpinner");
+}
+
+function transformRecommendationsIntoIDs(data) {
+  let idArray = [];
+  data.forEach((array) => {
+    array.forEach((recObject) => {
+      recObject.tracks.forEach((track) => {
+        idArray.push(track.id);
+      });
+    });
+  });
+  return idArray;
+}
+
+function sortRecommendations(data) {
+  let idCountMap = {};
+
+  data.forEach((id) => {
+    idCountMap[id] = (idCountMap[id] || 0) + 1;
+  });
+
+  const sortedObjectArray = Object.entries(idCountMap).sort(
+    (x, y) => y[1] - x[1]
+  );
+  // console.log("sorted array: ", sortedObjectArray);
+  const sortedObject = Object.fromEntries(sortedObjectArray);
+
+  return sortedObject;
 }
 
 async function loadPlaylistData(data) {
@@ -202,8 +504,9 @@ function handlePlaylistResponse(data) {
 }
 
 function handlePlaylistSongsResponse(data) {
+  // console.log(data);
   const songs = data.items;
-  const tableDiv = document.querySelector(".song-display");
+  const tableDiv = document.querySelector("#paginated-list");
   const table = document.getElementById("table-element");
   const tableBody = document.getElementById("table-body");
 
@@ -230,7 +533,10 @@ function handlePlaylistSongsResponse(data) {
     let trackItems = [artist, songName, albumName, dateAdded, duration];
 
     const tableRow = document.createElement("tr");
-    tableRow.setAttribute("class", "hover:bg-primaryDark");
+    tableRow.setAttribute(
+      "class",
+      "hover:bg-primaryDark transition-all duration-200 ease-in-out"
+    );
     const tableCell = document.createElement("td");
     const img = document.createElement("img");
     img.src = albumCover;
@@ -360,9 +666,7 @@ function changePage(page) {
   }
 
   const startIndex = currentPage * amountToShow;
-  console.log(startIndex);
   const endIndex = startIndex + amountToShow;
-  console.log(endIndex);
 
   for (let i = 0; i < arrayOfSongs.length; i++) {
     if (i >= startIndex && i < endIndex) {

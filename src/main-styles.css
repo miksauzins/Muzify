@@ -13,6 +13,13 @@
   html {
     font-family: "montserratthin";
   }
+  h1 {
+    @apply text-3xl;
+  }
+}
+@layer components {
+  .song-card {
+  }
 }
 
 #dropdown-container #menu-dropdown {

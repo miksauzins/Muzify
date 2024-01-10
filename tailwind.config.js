@@ -20,6 +20,12 @@ module.exports = {
         background: "#2E2E2E",
         white: "#FFFFFF",
       },
+      animation: {
+        "bounce-short": "bounce",
+      },
+      font: {
+        strong: "font-weight:700",
+      },
     },
   },
   plugins: [],

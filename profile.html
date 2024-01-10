@@ -12,7 +12,7 @@
       <div
         class="sticky max-w-none bg-primary flex justify-between items-stretch"
       >
-        <a href="#" class="ml-7 m-4"
+        <a href="/profile.html" class="ml-7 m-4"
           ><img src="" id="profile-picture" class="rounded-2xl"
         /></a>
         <h1 class="text-2xl font-light self-center" id="profile-name"></h1>
@@ -51,8 +51,42 @@
           <img
             id="userImage"
             src="icons/spotifyL.png"
-            class="object-scale-down h-64 w-64 drop-shadow-2xl rounded-full mr-3 py-2"
+            class="object-scale-down h-64 w-64 drop-shadow-2xl z-1 rounded-full mr-3 py-2 relative"
           />
+          <div class="absolute z-2">
+            <svg
+              id="headphones"
+              class="animate-bounce-short h-8 w-8 text-white absolute z-3 -top-3 right-0 left-11 hover:block"
+              style="display: none"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+              <path
+                d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"
+              />
+            </svg>
+            <div
+              id="currentSongDisplayBox"
+              class="hidden relative p-4 bg-primary text-black -top-10 left-0 overflow-visible"
+            >
+              <div class="flex w-full align-middle">
+                <img
+                  src="icons/spotifyL.png"
+                  class="w-12 h-auto rounded-sm"
+                  id="currentImage"
+                />
+                <div class="flex flex-col mx-8">
+                  <h3 class="text-lg text-white" id="currentSong">Song name</h3>
+                  <p class="text-sm text-neutral" id="currentArtist">Artist</p>
+                </div>
+              </div>
+            </div>
+          </div>
           <p id="followers">420 Followers</p>
           <p id="following">69 Following</p>
           <p id="playlistCount">30 Playlists</p>

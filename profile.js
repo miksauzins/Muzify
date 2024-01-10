@@ -1,3 +1,49 @@
+function getCurrentPlayingSong() {
+  const accessToken = localStorage.getItem("access_token");
+  const callURL = "https://api.spotify.com/v1/me/player/currently-playing";
+
+  fetch(callURL, {
+    headers: {
+      Authorization: "Bearer " + accessToken,
+    },
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+      handleCurrentSong(data);
+    })
+    .catch((error) => {
+      console.error("No song is currently being played", error);
+    });
+}
+
+function handleCurrentSong(data) {
+  const songData = data.item;
+  const isPlaying = data.is_playing;
+  const artistElement = document.querySelector("#currentArtist");
+  const songElement = document.querySelector("#currentSong");
+  const imageElement = document.querySelector("#currentImage");
+  const headphones = document.querySelector("#headphones");
+  const currentBox = document.querySelector("#currentSongDisplayBox");
+  if (!isPlaying) {
+    console.log("No track is currently being played.");
+  } else {
+    artistElement.textContent = songData.artists[0].name;
+    songElement.textContent = songData.name;
+    const imageURL = songData.album.images[1].url;
+    imageElement.setAttribute("src", imageURL);
+    headphones.style.display = "block";
+    headphones.addEventListener("mouseover", function () {
+      currentBox.classList.remove("hidden");
+    });
+    document.addEventListener("mouseout", function () {
+      currentBox.classList.add("hidden");
+    });
+  }
+}
+
 async function getPlaylists() {
   const accessToken = localStorage.getItem("access_token");
   const callURL = "https://api.spotify.com/v1/me/playlists?limit=50";
@@ -11,7 +57,6 @@ async function getPlaylists() {
       return response.json();
     })
     .then((data) => {
-      console.log(data);
       handlePlaylistData(data);
     })
     .catch((error) => {
@@ -21,7 +66,6 @@ async function getPlaylists() {
 
 function handlePlaylistData(data) {
   const playlistData = data.items;
-  console.log(playlistData);
   const playlistTableDiv = document.querySelector("#playlistMenu");
   playlistData.forEach((element) => {
     const playlistDiv = document.createElement("div");
@@ -94,4 +138,9 @@ function handleRecentlyPlayedData(data) {
   }
 }
 
-window.addEventListener("load", getPlaylists(), getRecentlyPlayed());
+window.addEventListener(
+  "load",
+  getCurrentPlayingSong(),
+  getPlaylists(),
+  getRecentlyPlayed()
+);
