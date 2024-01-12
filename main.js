@@ -491,7 +491,7 @@ async function loadPlaylistData(data) {
     infoElement.textContent = playlistInfo;
   }
   paginateItems();
-
+}
 
 function handlePlaylistResponse(data) {
   const playlists = data.items;
