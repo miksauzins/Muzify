@@ -41,9 +41,6 @@ async function listenPlaylistChoice() {
   const refreshRecButton = document.querySelector("#refreshRecButton");
 
   if (dropDownChoice != "noneSelected") {
-    // if (table.style.display == "none") {
-    //   table.style.display = "table";
-    // }
     if (recButton.style.display == "none") {
       recButton.style.display = "block";
     }
@@ -292,32 +289,31 @@ async function initRecommendations() {
   let sortedIdArray = Object.keys(sortedIdList);
 
   const retrievableSongs = sortedIdArray.splice(0, 5).join(",");
+  const songs = await getTracksByIDs(retrievableSongs);
+
+  handleRecommendedSongDisplay(songs);
+
+  const retrievableSongsArray = retrievableSongs.split(",");
+  sortedIdArray.push(...retrievableSongsArray);
   window.sessionStorage.setItem(
     "RecommendedIDs",
     JSON.stringify(sortedIdArray)
   );
-  const songs = await getTracksByIDs(retrievableSongs);
-
-  handleRecommendedSongDisplay(songs);
 
   toggleDisplay("#recommendationListContainer", "flex");
   toggleDisplay("#refreshRecButton");
   toggleDisplay("#recButton");
+  toggleDisplay("#recListSpinner");
 }
 
 async function refreshRecommendations() {
-  const remainingIdArray = JSON.parse(
-    window.sessionStorage.getItem("RecommendedIDs")
-  );
-  const retrievableSongs = remainingIdArray.splice(0, 5).join(",");
-  if (retrievableSongs.length == 0) {
-  }
+  const IdArray = JSON.parse(window.sessionStorage.getItem("RecommendedIDs"));
+  const retrievableSongs = IdArray.splice(0, 5).join(",");
   const songs = await getTracksByIDs(retrievableSongs);
   handleRecommendedSongDisplay(songs);
-  window.sessionStorage.setItem(
-    "RecommendedIDs",
-    JSON.stringify(remainingIdArray)
-  );
+  const retrievableSongsArray = retrievableSongs.split(",");
+  IdArray.push(...retrievableSongsArray);
+  window.sessionStorage.setItem("RecommendedIDs", JSON.stringify(IdArray));
 }
 
 function clearList(selector) {
@@ -336,6 +332,7 @@ function handleRecommendedSongDisplay(data) {
   clearList("#recommendationList");
 
   tracks.forEach((songObject) => {
+    console.log(songObject);
     const listElement = document.createElement("li");
     listElement.setAttribute(
       "class",
@@ -405,23 +402,30 @@ function handleRecommendedSongDisplay(data) {
     });
     actionDiv.appendChild(playButton);
 
-    const volumeBar = document.createElement("input");
-    volumeBar.setAttribute("type", "range");
-    volumeBar.setAttribute("min", "0");
-    volumeBar.setAttribute("max", "1");
-    volumeBar.setAttribute("step", "0.01");
-    volumeBar.setAttribute("value", "0.5");
-    volumeBar.setAttribute("class", "mx-2 w-3");
-    volumeBar.setAttribute("title", "Volume Bar");
-    volumeBar.addEventListener("input", () => {
-      audioElement.volume = volumeBar.value;
-    });
-    actionDiv.appendChild(volumeBar);
+    //Refactor the volume bar and audio player into one single audio player
+    //Current one allows user to play each song simultaneously, which is not good
+    // const volumeBar = document.createElement("input");
+    // volumeBar.setAttribute("type", "range");
+    // volumeBar.setAttribute("min", "0");
+    // volumeBar.setAttribute("max", "1");
+    // volumeBar.setAttribute("step", "0.01");
+    // volumeBar.setAttribute("value", "0.5");
+    // volumeBar.setAttribute("class", "mx-2 w-3");
+    // volumeBar.setAttribute("title", "Volume Bar");
+    // volumeBar.addEventListener("input", () => {
+    //   audioElement.volume = volumeBar.value;
+    // });
+    // actionDiv.appendChild(volumeBar);
 
     const addButton = document.createElement("button");
     addButton.innerHTML = "Add";
     const trackID = songObject.id;
     addButton.setAttribute("onclick", `addTrackToPlaylist("${trackID}")`);
+
+    addButton.addEventListener("click", () => {
+      addTrackToPlaylist(`${trackID}`);
+      addRecTrackToTable(songObject);
+    });
 
     actionDiv.appendChild(addButton);
     containerDiv.appendChild(actionDiv);
@@ -430,8 +434,9 @@ function handleRecommendedSongDisplay(data) {
     recommendationList.appendChild(listElement);
   });
   recommendationListContainer.appendChild(recommendationList);
-  toggleDisplay("#recListSpinner");
 }
+
+function addRecTrackToTable(data) {}
 
 function transformRecommendationsIntoIDs(data) {
   let idArray = [];
@@ -486,7 +491,7 @@ async function loadPlaylistData(data) {
     infoElement.textContent = playlistInfo;
   }
   paginateItems();
-}
+
 
 function handlePlaylistResponse(data) {
   const playlists = data.items;
@@ -504,7 +509,7 @@ function handlePlaylistResponse(data) {
 }
 
 function handlePlaylistSongsResponse(data) {
-  // console.log(data);
+  console.log(data);
   const songs = data.items;
   const tableDiv = document.querySelector("#paginated-list");
   const table = document.getElementById("table-element");
