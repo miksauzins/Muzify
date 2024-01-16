@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <link rel="stylesheet" href="./src/main-styles.css" />
+    <link href="./dist/output.css" rel="stylesheet" />
+  </head>
+  <body>
+    <nav>
+      <div
+        class="sticky max-w-none bg-primary flex justify-between items-stretch"
+      >
+        <a href="/profile.html" class="ml-7 m-4"
+          ><img src="" id="profile-picture" class="rounded-2xl"
+        /></a>
+        <h1 class="text-2xl font-light self-center" id="profile-name"></h1>
+        <div class="relative min-h-full" id="dropdown-container">
+          <button
+            id="button-dropdown"
+            class="p-5 px-10 bg-primary min-h-full hover:bg-secondary"
+          >
+            Menu
+          </button>
+          <div
+            id="menu-dropdown"
+            class="absolute bg-black z-2 w-full overflow-auto"
+          >
+            <button
+              class="p-5 bg-secondary w-full"
+              type="button"
+              onclick="redirectUser(`main.html`)"
+            >
+              Playlists
+            </button>
+            <button
+              class="p-5 bg-secondary text-center w-full"
+              type="button"
+              onclick="clientLogOut()"
+            >
+              Log Out
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="bg-background min-h-screen" id="background">
+      <div class="flex justify-start items-center ml-10 py-5">
+        <div class="flex flex-col items-center w-4/12 text-white">
+          <img
+            id="userImage"
+            src="icons/spotifyL.png"
+            class="object-scale-down h-64 w-64 drop-shadow-2xl z-1 rounded-full mr-3 py-2 relative"
+          />
+          <div class="absolute z-2">
+            <svg
+              id="headphones"
+              class="animate-bounce-short h-8 w-8 text-white absolute z-3 -top-3 right-0 left-11 hover:block"
+              style="display: none"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+              <path
+                d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"
+              />
+            </svg>
+            <div
+              id="currentSongDisplayBox"
+              class="hidden relative p-4 bg-primary text-black -top-10 left-0 overflow-visible"
+            >
+              <div class="flex w-full align-middle">
+                <img
+                  src="icons/spotifyL.png"
+                  class="w-12 h-auto rounded-sm"
+                  id="currentImage"
+                />
+                <div class="flex flex-col mx-8">
+                  <h3 class="text-lg text-white" id="currentSong">Song name</h3>
+                  <p class="text-sm text-neutral" id="currentArtist">Artist</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p id="followers">420 Followers</p>
+          <p id="following">69 Following</p>
+          <p id="playlistCount">30 Playlists</p>
+        </div>
+        <div
+          class="flex flex-col py-3 w-full text-white"
+          id="recentlyPlayedDiv"
+        >
+          <h1 class="text-lg text-center py-2">Recently Most Played Songs</h1>
+          <ul id="recentlyPlayed">
+            <li class="p-3 bg-background hover:bg-primaryDark">
+              <div class="flex w-full align-middle">
+                <img
+                  src="icons/spotifyL.png"
+                  class="w-12 h-auto rounded-sm"
+                  id="songImg1"
+                />
+                <div class="flex flex-col mx-8">
+                  <h3 class="text-lg text-white" id="songName1">Song name</h3>
+                  <p class="text-sm text-neutral" id="songArtist1">Artist</p>
+                </div>
+                <div class="flex ml-auto mr-5 items-center">
+                  <p class="text-neutral text-lg" id="duration1">5:23</p>
+                </div>
+              </div>
+            </li>
+            <li class="p-3 bg-background hover:bg-primaryDark">
+              <div class="flex w-full align-middle">
+                <img
+                  src="icons/spotifyL.png"
+                  class="w-12 h-auto"
+                  id="songImg2"
+                />
+                <div class="flex flex-col mx-8">
+                  <h3 class="text-lg text-white" id="songName2">Song name</h3>
+                  <p class="text-sm text-neutral" id="songArtist2">Artist</p>
+                </div>
+                <div class="flex ml-auto mr-5 items-center">
+                  <p class="text-neutral text-lg" id="duration2">5:23</p>
+                </div>
+              </div>
+            </li>
+
+            <li class="p-3 bg-background hover:bg-primaryDark">
+              <div class="flex w-full align-middle">
+                <img
+                  src="icons/spotifyL.png"
+                  class="w-12 h-auto"
+                  id="songImg3"
+                />
+                <div class="flex flex-col mx-8">
+                  <h3 class="text-lg text-white" id="songName3">Song name</h3>
+                  <p class="text-sm text-neutral" id="songArtist3">Artist</p>
+                </div>
+                <div class="flex ml-auto mr-5 items-center">
+                  <p class="text-neutral text-lg" id="duration3">5:23</p>
+                </div>
+              </div>
+            </li>
+            <li class="p-3 bg-background hover:bg-primaryDark">
+              <div class="flex w-full align-middle">
+                <img
+                  src="icons/spotifyL.png"
+                  class="w-12 h-auto"
+                  id="songImg4"
+                />
+                <div class="flex flex-col mx-8">
+                  <h3 class="text-lg text-white" id="songName4">Song name</h3>
+                  <p class="text-sm text-neutral" id="songArtist4">Artist</p>
+                </div>
+                <div class="flex ml-auto mr-5 items-center">
+                  <p class="text-neutral text-lg" id="duration4">5:23</p>
+                </div>
+              </div>
+            </li>
+            <li class="p-3 bg-background hover:bg-primaryDark">
+              <div class="flex w-full align-middle">
+                <img
+                  src="icons/spotifyL.png"
+                  class="w-12 h-auto"
+                  id="songImg5"
+                />
+                <div class="flex flex-col mx-8">
+                  <h3 class="text-lg text-white" id="songName5">Song name</h3>
+                  <p class="text-sm text-neutral" id="songArtist5">Artist</p>
+                </div>
+                <div class="flex ml-auto mr-5 items-center">
+                  <p class="text-neutral text-lg" id="duration5">5:23</p>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <br />
+      </div>
+      <div class="w-full border-b-2 border-primaryDark"></div>
+      <div class="flex flex-col items-center text-white justify-center py-3">
+        <h1 class="text-2xl py-3">User's playlists</h1>
+        <div class="w-4/12 border-b-2 border-primaryDark text-center"></div>
+      </div>
+      <div class="flex items-center my-5 flex-wrap" id="playlistMenu"></div>
+    </div>
+    <script src="profile.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
