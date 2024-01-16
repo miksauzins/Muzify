@@ -1,4 +1,6 @@
 let playerState = false;
+let canEdit = true;
+let currentUserURI = "";
 
 function checkUserAuthorization() {
   let accessToken = localStorage.getItem("access_token");
@@ -378,6 +380,7 @@ function removeTrackFromPlaylist() {
 }
 
 function handleProfileData(data) {
+  userURI = data.uri;
   const userName = data.display_name;
   const userProfilePicture = data.images[0].url;
   const userNameField = document.getElementById("profile-name");
@@ -395,6 +398,19 @@ function handleProfileData(data) {
 }
 
 async function loadPlaylistData(data) {
+  console.log(data);
+  playlistUserURI = data.owner.uri;
+  const canEditText = document.querySelector("#canEditPlaylist");
+  const collaborative = data.collaborative;
+  if (playlistUserURI != userURI && !collaborative) {
+    canEdit = false;
+    canEditText.classList.remove("hidden");
+  } else {
+    canEdit = true;
+    if (!canEditText.classList.contains("hidden")) {
+      canEditText.classList.add("hidden");
+    }
+  }
   const imageElement = document.querySelector("#playlistImage");
   const nameElement = document.querySelector("#playlistName");
   const infoElement = document.querySelector("#playlistInfo");
@@ -494,12 +510,17 @@ function handlePlaylistSongsResponse(data) {
     const deleteCell = document.createElement("td");
     const deleteButton = document.createElement("button");
     deleteButton.innerHTML = "Remove";
-    deleteButton.setAttribute("class", "hover:bg-red-700");
-    // deleteButton.setAttribute("data-value", element.track.id);
-    // deleteButton.setAttribute("id", element.track.id);
-    deleteButton.addEventListener("click", () => {
-      changeDialogState(element.track.id);
-    });
+    if (!canEdit) {
+      deleteButton.setAttribute("disabled", "");
+      deleteButton.setAttribute("class", "line-through");
+    } else {
+      deleteButton.setAttribute("class", "hover:bg-red-700");
+      // deleteButton.setAttribute("data-value", element.track.id);
+      // deleteButton.setAttribute("id", element.track.id);
+      deleteButton.addEventListener("click", () => {
+        changeDialogState(element.track.id);
+      });
+    }
     deleteCell.appendChild(deleteButton);
 
     tableRow.appendChild(linkCell);
@@ -649,6 +670,10 @@ function handleRecommendedSongDisplay(data) {
 
     const addButton = document.createElement("button");
     addButton.innerHTML = "Add";
+    if (!canEdit) {
+      addButton.setAttribute("disabled", "");
+      addButton.setAttribute("class", "line-through");
+    }
     const trackID = songObject.id;
 
     addButton.addEventListener("click", () => {
